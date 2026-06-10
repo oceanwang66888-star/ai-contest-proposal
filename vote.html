@@ -1,0 +1,1126 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>AI驱动的海外GEO增长 - 拉票海报 v2</title>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Noto+Sans+SC:wght@300;400;500;600;700;900&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        :root {
+            --primary: #0A84FF;
+            --accent: #00F5D4;
+            --orange: #FF9500;
+            --purple: #A855F7;
+            --surface: rgba(10, 17, 34, 0.85);
+            --border: rgba(0, 245, 212, 0.15);
+            --glow-cyan: 0 0 20px rgba(0, 245, 212, 0.4);
+            --glow-blue: 0 0 20px rgba(10, 132, 255, 0.4);
+        }
+
+        body {
+            font-family: 'Noto Sans SC', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: #000;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 20px;
+            overflow-x: hidden;
+        }
+
+        /* 神经网络背景 */
+        #neural-canvas {
+            position: fixed;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        .poster {
+            width: 100%;
+            max-width: 540px;
+            background: linear-gradient(180deg, #020610 0%, #0a1628 50%, #020610 100%);
+            border-radius: 24px;
+            overflow: hidden;
+            position: relative;
+            box-shadow: 0 0 80px rgba(0, 245, 212, 0.15), 0 0 120px rgba(10, 132, 255, 0.1);
+            border: 1px solid rgba(0, 245, 212, 0.1);
+        }
+
+        /* 顶部科技光效 */
+        .top-glow {
+            position: absolute;
+            top: 0; left: 0; right: 0;
+            height: 300px;
+            background:
+                radial-gradient(ellipse at 50% 0%, rgba(10, 132, 255, 0.35) 0%, transparent 60%),
+                radial-gradient(ellipse at 30% 20%, rgba(0, 245, 212, 0.15) 0%, transparent 40%),
+                radial-gradient(ellipse at 70% 10%, rgba(168, 85, 247, 0.1) 0%, transparent 35%);
+            pointer-events: none;
+        }
+
+        /* 网格纹理 */
+        .poster::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background-image:
+                linear-gradient(rgba(10, 132, 255, 0.03) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(10, 132, 255, 0.03) 1px, transparent 1px);
+            background-size: 30px 30px;
+            pointer-events: none;
+        }
+
+        /* 流动数据线 */
+        .data-stream {
+            position: absolute;
+            width: 2px;
+            height: 60px;
+            background: linear-gradient(180deg, transparent, var(--accent), transparent);
+            animation: streamDown 4s ease-in-out infinite;
+            opacity: 0.4;
+            border-radius: 2px;
+        }
+        .data-stream:nth-child(1) { left: 12%; animation-delay: 0s; }
+        .data-stream:nth-child(2) { left: 50%; animation-delay: 1.5s; }
+        .data-stream:nth-child(3) { left: 88%; animation-delay: 3s; }
+
+        @keyframes streamDown {
+            0% { top: -60px; opacity: 0; }
+            50% { opacity: 0.4; }
+            100% { top: 100%; opacity: 0; }
+        }
+
+        /* === SVG 图标系统 === */
+        .icon-svg {
+            width: 20px; height: 20px;
+            stroke: currentColor;
+            stroke-width: 2;
+            stroke-linecap: round;
+            stroke-linejoin: round;
+            fill: none;
+            flex-shrink: 0;
+        }
+        .icon-svg.lg { width: 28px; height: 28px; }
+
+        /* 头部 */
+        .header {
+            padding: 36px 28px 28px;
+            text-align: center;
+            position: relative;
+            z-index: 1;
+        }
+
+        .badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: linear-gradient(135deg, rgba(10, 132, 255, 0.25), rgba(0, 245, 212, 0.15));
+            border: 1px solid rgba(0, 245, 212, 0.4);
+            padding: 8px 18px;
+            border-radius: 25px;
+            font-size: 12px;
+            font-weight: 600;
+            color: #00F5D4;
+            letter-spacing: 1px;
+            margin-bottom: 18px;
+            font-family: 'Space Grotesk', 'Noto Sans SC', sans-serif;
+            animation: badge-glow 2.5s ease-in-out infinite;
+        }
+
+        @keyframes badge-glow {
+            0%, 100% { box-shadow: 0 0 20px rgba(0, 245, 212, 0.2); }
+            50% { box-shadow: 0 0 35px rgba(0, 245, 212, 0.4); }
+        }
+
+        .title {
+            font-family: 'Space Grotesk', 'Noto Sans SC', sans-serif;
+            font-size: 28px;
+            font-weight: 700;
+            background: linear-gradient(135deg, #FFFFFF 0%, #00F5D4 60%, #0A84FF 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            line-height: 1.3;
+            margin-bottom: 10px;
+        }
+
+        .subtitle {
+            font-size: 14px;
+            color: rgba(255, 255, 255, 0.6);
+            font-family: 'Space Grotesk', 'Noto Sans SC', sans-serif;
+        }
+
+        /* 核心数据 */
+        .core-stats {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 10px;
+            padding: 0 24px;
+            margin-bottom: 20px;
+            position: relative;
+            z-index: 1;
+        }
+
+        .stat-box {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            border-radius: 14px;
+            padding: 14px 8px;
+            text-align: center;
+            transition: all 0.3s ease;
+        }
+
+        .stat-box:hover {
+            transform: translateY(-3px);
+            border-color: rgba(0, 245, 212, 0.3);
+        }
+
+        .stat-box:nth-child(1) { border-top: 2px solid #0A84FF; }
+        .stat-box:nth-child(2) { border-top: 2px solid #00F5D4; }
+        .stat-box:nth-child(3) { border-top: 2px solid #A855F7; }
+        .stat-box:nth-child(4) { border-top: 2px solid #FF9500; }
+
+        .stat-value {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 26px;
+            font-weight: 700;
+            line-height: 1;
+            margin-bottom: 4px;
+        }
+
+        .stat-box:nth-child(1) .stat-value { color: #0A84FF; text-shadow: var(--glow-blue); }
+        .stat-box:nth-child(2) .stat-value { color: #00F5D4; text-shadow: var(--glow-cyan); }
+        .stat-box:nth-child(3) .stat-value { color: #A855F7; text-shadow: 0 0 20px rgba(168, 85, 247, 0.4); }
+        .stat-box:nth-child(4) .stat-value { color: #FF9500; text-shadow: 0 0 20px rgba(255, 149, 0, 0.4); }
+
+        .stat-label {
+            font-size: 10px;
+            color: rgba(255, 255, 255, 0.5);
+            letter-spacing: 0.5px;
+        }
+
+        /* AI 对话气泡 - 金句 */
+        .ai-chat {
+            margin: 20px 24px;
+            position: relative;
+            z-index: 1;
+        }
+
+        .ai-chat-header {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 10px;
+        }
+
+        .ai-avatar {
+            width: 24px; height: 24px;
+            border-radius: 6px;
+            background: linear-gradient(135deg, var(--primary), var(--accent));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .ai-avatar svg { width: 14px; height: 14px; fill: #fff; }
+
+        .ai-name {
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 12px;
+            color: var(--accent);
+            font-weight: 600;
+            letter-spacing: 0.5px;
+        }
+
+        .ai-bubble {
+            background: rgba(10, 132, 255, 0.1);
+            border: 1px solid rgba(0, 245, 212, 0.2);
+            border-radius: 2px 16px 16px 16px;
+            padding: 20px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .ai-bubble::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0;
+            height: 2px;
+            background: linear-gradient(90deg, var(--primary), var(--accent));
+        }
+
+        .ai-bubble-text {
+            font-size: 15px;
+            font-weight: 600;
+            color: #FFFFFF;
+            line-height: 1.7;
+        }
+
+        .typing-cursor {
+            display: inline-block;
+            width: 2px;
+            height: 16px;
+            background: var(--accent);
+            margin-left: 2px;
+            animation: blink 1s step-end infinite;
+            vertical-align: text-bottom;
+        }
+
+        @keyframes blink {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0; }
+        }
+
+        /* 五大模块 - SVG图标 */
+        .modules-section {
+            padding: 0 24px;
+            margin-bottom: 18px;
+            position: relative;
+            z-index: 1;
+        }
+
+        .modules-title {
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 11px;
+            color: rgba(255, 255, 255, 0.4);
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            margin-bottom: 12px;
+        }
+
+        .modules-grid {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 8px;
+        }
+
+        .module-item {
+            background: rgba(0, 0, 0, 0.4);
+            border-radius: 12px;
+            padding: 14px 6px;
+            text-align: center;
+            border: 1px solid rgba(255, 255, 255, 0.04);
+            transition: all 0.3s ease;
+        }
+
+        .module-item:hover {
+            transform: scale(1.05);
+            border-color: rgba(0, 245, 212, 0.25);
+            background: rgba(0, 245, 212, 0.05);
+        }
+
+        .module-icon-wrap {
+            width: 36px; height: 36px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 8px;
+        }
+
+        .module-item:nth-child(1) .module-icon-wrap { background: rgba(10, 132, 255, 0.15); color: #0A84FF; }
+        .module-item:nth-child(2) .module-icon-wrap { background: rgba(0, 245, 212, 0.15); color: #00F5D4; }
+        .module-item:nth-child(3) .module-icon-wrap { background: rgba(255, 149, 0, 0.15); color: #FF9500; }
+        .module-item:nth-child(4) .module-icon-wrap { background: rgba(168, 85, 247, 0.15); color: #A855F7; }
+        .module-item:nth-child(5) .module-icon-wrap { background: rgba(255, 59, 48, 0.15); color: #FF3B30; }
+
+        .module-name {
+            font-size: 10px;
+            color: rgba(255, 255, 255, 0.8);
+            font-weight: 600;
+        }
+
+        /* 数据资产 - 终端风格 */
+        .assets-section {
+            padding: 0 24px;
+            margin-bottom: 18px;
+            position: relative;
+            z-index: 1;
+        }
+
+        .assets-title {
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 11px;
+            color: rgba(255, 255, 255, 0.4);
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            margin-bottom: 12px;
+        }
+
+        .terminal-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 10px;
+        }
+
+        .asset-item {
+            background: rgba(0, 0, 0, 0.5);
+            border: 1px solid rgba(0, 245, 212, 0.12);
+            border-radius: 12px;
+            padding: 14px 10px;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .asset-item::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0;
+            width: 3px; height: 100%;
+            background: var(--accent);
+            opacity: 0.4;
+        }
+
+        .asset-value {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 22px;
+            font-weight: 700;
+            color: #00F5D4;
+            text-shadow: 0 0 15px rgba(0, 245, 212, 0.3);
+        }
+
+        .asset-label {
+            font-size: 10px;
+            color: rgba(255, 255, 255, 0.5);
+            margin-top: 4px;
+        }
+
+        /* 效率对比 - 进度条 */
+        .efficiency-section {
+            padding: 0 24px;
+            margin-bottom: 18px;
+            position: relative;
+            z-index: 1;
+        }
+
+        .efficiency-title {
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 11px;
+            color: rgba(255, 255, 255, 0.4);
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            margin-bottom: 12px;
+        }
+
+        .efficiency-row {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+            margin-bottom: 10px;
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 10px;
+            padding: 12px;
+            border: 1px solid rgba(255, 255, 255, 0.04);
+        }
+
+        .efficiency-top {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .efficiency-task {
+            font-size: 12px;
+            color: rgba(255, 255, 255, 0.8);
+            font-weight: 500;
+        }
+
+        .efficiency-time {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .time-old {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 11px;
+            color: rgba(255, 149, 0, 0.6);
+            text-decoration: line-through;
+        }
+
+        .arrow {
+            color: #00F5D4;
+            font-size: 12px;
+        }
+
+        .time-new {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 12px;
+            color: #00F5D4;
+            font-weight: 700;
+        }
+
+        .efficiency-bar-wrap {
+            width: 100%;
+            height: 4px;
+            background: rgba(255, 255, 255, 0.06);
+            border-radius: 2px;
+            overflow: hidden;
+        }
+
+        .efficiency-bar {
+            height: 100%;
+            border-radius: 2px;
+            background: linear-gradient(90deg, var(--primary), var(--accent));
+            transition: width 1.5s ease;
+        }
+
+        /* 团队亮点 */
+        .team-section {
+            margin: 0 24px 18px;
+            background: linear-gradient(135deg, rgba(168, 85, 247, 0.12) 0%, rgba(255, 149, 0, 0.08) 100%);
+            border: 1px solid rgba(168, 85, 247, 0.2);
+            border-radius: 16px;
+            padding: 20px;
+            text-align: center;
+            position: relative;
+            z-index: 1;
+            overflow: hidden;
+        }
+
+        .team-section::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0;
+            height: 2px;
+            background: linear-gradient(90deg, #A855F7, #FF9500);
+        }
+
+        .team-title {
+            font-family: 'Space Grotesk', 'Noto Sans SC', sans-serif;
+            font-size: 24px;
+            font-weight: 700;
+            background: linear-gradient(135deg, #A855F7 0%, #FF9500 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 6px;
+        }
+
+        .team-desc {
+            font-size: 12px;
+            color: rgba(255, 255, 255, 0.7);
+        }
+
+        /* 组织协同卡片 */
+        .synergy-card {
+            margin: 0 24px 18px;
+            padding: 16px 20px;
+            background: linear-gradient(135deg, rgba(168,85,247,0.08), rgba(10,132,255,0.06));
+            border: 1px solid rgba(168,85,247,0.2);
+            border-radius: 14px;
+            position: relative;
+            overflow: hidden;
+            z-index: 1;
+        }
+        .synergy-card::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0;
+            width: 100%; height: 2px;
+            background: linear-gradient(90deg, transparent, rgba(168,85,247,0.6), rgba(0,245,212,0.4), transparent);
+            animation: synergyScan 3.5s ease-in-out infinite;
+        }
+        @keyframes synergyScan {
+            0%, 100% { transform: translateX(-100%); }
+            50% { transform: translateX(100%); }
+        }
+        .synergy-label {
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 10px;
+            color: var(--purple);
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .synergy-text {
+            font-size: 13px;
+            color: rgba(255,255,255,0.85);
+            line-height: 1.7;
+        }
+
+        /* 战略价值 */
+        .value-section {
+            padding: 0 24px;
+            margin-bottom: 18px;
+            position: relative;
+            z-index: 1;
+        }
+
+        .value-title {
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 11px;
+            color: rgba(255, 255, 255, 0.4);
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            margin-bottom: 12px;
+        }
+
+        .value-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 10px;
+        }
+
+        .value-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 10px;
+            padding: 12px;
+            border: 1px solid rgba(255, 255, 255, 0.04);
+        }
+
+        .value-icon-wrap {
+            width: 32px; height: 32px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+        }
+
+        .value-item:nth-child(1) .value-icon-wrap { background: rgba(10, 132, 255, 0.15); color: #0A84FF; }
+        .value-item:nth-child(2) .value-icon-wrap { background: rgba(0, 245, 212, 0.15); color: #00F5D4; }
+        .value-item:nth-child(3) .value-icon-wrap { background: rgba(255, 149, 0, 0.15); color: #FF9500; }
+        .value-item:nth-child(4) .value-icon-wrap { background: rgba(168, 85, 247, 0.15); color: #A855F7; }
+
+        .value-text {
+            font-size: 11px;
+            color: rgba(255, 255, 255, 0.8);
+        }
+
+        /* 拉票区 */
+        .vote-section {
+            background: linear-gradient(180deg, rgba(10, 132, 255, 0.15) 0%, rgba(0, 245, 212, 0.1) 100%);
+            padding: 28px 24px;
+            text-align: center;
+            position: relative;
+            z-index: 1;
+        }
+
+        .vote-section::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0;
+            height: 2px;
+            background: linear-gradient(90deg, transparent, var(--accent), transparent);
+        }
+
+        .vote-title {
+            font-family: 'Space Grotesk', 'Noto Sans SC', sans-serif;
+            font-size: 20px;
+            font-weight: 700;
+            color: #FFFFFF;
+            margin-bottom: 8px;
+        }
+
+        .vote-desc {
+            font-size: 13px;
+            color: rgba(255, 255, 255, 0.7);
+            margin-bottom: 20px;
+        }
+
+        .vote-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: linear-gradient(135deg, #0A84FF 0%, #00F5D4 100%);
+            color: #FFFFFF;
+            font-family: 'Space Grotesk', 'Noto Sans SC', sans-serif;
+            font-size: 17px;
+            font-weight: 700;
+            padding: 16px 48px;
+            border-radius: 35px;
+            text-decoration: none;
+            box-shadow: 0 10px 40px rgba(10, 132, 255, 0.4), 0 0 60px rgba(0, 245, 212, 0.15);
+            transition: all 0.3s ease;
+            animation: pulse-btn 2.5s ease-in-out infinite;
+            border: none;
+            cursor: pointer;
+        }
+
+        @keyframes pulse-btn {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.03); }
+        }
+
+        .vote-btn:hover {
+            transform: scale(1.05);
+            box-shadow: 0 15px 50px rgba(10, 132, 255, 0.5), 0 0 80px rgba(0, 245, 212, 0.2);
+        }
+
+        /* 指纹图标动画 */
+        .fingerprint-icon {
+            width: 28px; height: 28px;
+            flex-shrink: 0;
+        }
+        .fingerprint-path {
+            fill: none;
+            stroke: #FFFFFF;
+            stroke-width: 2;
+            stroke-linecap: round;
+            stroke-linejoin: round;
+            stroke-dasharray: 80;
+            stroke-dashoffset: 80;
+            animation: fingerprintDraw 1.8s ease-in-out infinite alternate;
+        }
+        @keyframes fingerprintDraw {
+            0% { stroke-dashoffset: 80; opacity: 0.4; filter: drop-shadow(0 0 4px rgba(255,255,255,0.4)); }
+            100% { stroke-dashoffset: 0; opacity: 1; filter: drop-shadow(0 0 10px rgba(0,245,212,0.8)); }
+        }
+
+        /* 底部 */
+        .footer {
+            padding: 18px 24px 24px;
+            text-align: center;
+            position: relative;
+            z-index: 1;
+        }
+
+        .brand {
+            font-family: 'Space Grotesk', 'Noto Sans SC', sans-serif;
+            font-size: 13px;
+            color: rgba(255, 255, 255, 0.5);
+            margin-bottom: 4px;
+        }
+
+        .track {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 11px;
+            color: rgba(255, 255, 255, 0.35);
+        }
+
+        /* 响应式 */
+        @media (max-width: 420px) {
+            .title { font-size: 24px; }
+            .core-stats { grid-template-columns: repeat(2, 1fr); }
+            .modules-grid { grid-template-columns: repeat(3, 1fr); }
+            .terminal-grid { grid-template-columns: repeat(2, 1fr); }
+            .stat-value { font-size: 22px; }
+        }
+    </style>
+</head>
+<body>
+    <canvas id="neural-canvas"></canvas>
+
+    <div class="poster">
+        <div class="top-glow"></div>
+        <div class="data-stream"></div>
+        <div class="data-stream"></div>
+        <div class="data-stream"></div>
+
+        <!-- 头部 -->
+        <div class="header">
+            <div class="badge">
+                <svg class="icon-svg" viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+                AI 效率优化赛道
+            </div>
+            <h1 class="title">AI驱动的海外GEO增长<br>与组织升级体系</h1>
+            <p class="subtitle">天娃印尼市场从0到1的AI战略实践</p>
+        </div>
+
+        <!-- 核心数据 -->
+        <div class="core-stats">
+            <div class="stat-box">
+                <div class="stat-value" data-count="200">0</div>
+                <div class="stat-label">数据资产</div>
+            </div>
+            <div class="stat-box">
+                <div class="stat-value" data-count="80">0</div>
+                <div class="stat-label">效率提升%</div>
+            </div>
+            <div class="stat-box">
+                <div class="stat-value">5</div>
+                <div class="stat-label">AI模块</div>
+            </div>
+            <div class="stat-box">
+                <div class="stat-value">2</div>
+                <div class="stat-label">人团队</div>
+            </div>
+        </div>
+
+        <!-- AI 对话气泡 -->
+        <div class="ai-chat">
+            <div class="ai-chat-header">
+                <div class="ai-avatar">
+                    <svg viewBox="0 0 24 24"><path d="M12 2a2 2 0 012 2c0 .74-.4 1.39-1 1.73V7h1a7 7 0 017 7h1a1 1 0 011 1v3a1 1 0 01-1 1h-1.07A7.001 7.001 0 0114 23h-4a7.001 7.001 0 01-6.93-6H2a1 1 0 01-1-1v-3a1 1 0 011-1h1a7 7 0 017-7h1V5.73A2 2 0 0112 2zM7.5 14a1.5 1.5 0 100 3 1.5 1.5 0 000-3zm9 0a1.5 1.5 0 100 3 1.5 1.5 0 000-3z"/></svg>
+                </div>
+                <span class="ai-name">GEO AI Agent</span>
+            </div>
+            <div class="ai-bubble">
+                <p class="ai-bubble-text"><span style="color: var(--accent);">2人团队，用AI重构了传统需要10人完成的GEO业务</span><br>AI不是工具，是组织能力的放大器<span class="typing-cursor"></span></p>
+            </div>
+        </div>
+
+        <!-- 五大模块 -->
+        <div class="modules-section">
+            <div class="modules-title">五大 AI 工作流模块</div>
+            <div class="modules-grid">
+                <div class="module-item">
+                    <div class="module-icon-wrap">
+                        <svg class="icon-svg" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg>
+                    </div>
+                    <div class="module-name">市场诊断</div>
+                </div>
+                <div class="module-item">
+                    <div class="module-icon-wrap">
+                        <svg class="icon-svg" viewBox="0 0 24 24"><path d="M21 2l-2 2m-7.61 7.61a5.5 5.5 0 11-7.778 7.778 5.5 5.5 0 017.777-7.777zm0 0L15.5 7.5m0 0l3 3L22 7l-3-3m-3.5 3.5L19 4"/></svg>
+                    </div>
+                    <div class="module-name">关键词矩阵</div>
+                </div>
+                <div class="module-item">
+                    <div class="module-icon-wrap">
+                        <svg class="icon-svg" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+                    </div>
+                    <div class="module-name">合同审核</div>
+                </div>
+                <div class="module-item">
+                    <div class="module-icon-wrap">
+                        <svg class="icon-svg" viewBox="0 0 24 24"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
+                    </div>
+                    <div class="module-name">KPI设计</div>
+                </div>
+                <div class="module-item">
+                    <div class="module-icon-wrap">
+                        <svg class="icon-svg" viewBox="0 0 24 24"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+                    </div>
+                    <div class="module-name">执行监测</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 数据资产 -->
+        <div class="assets-section">
+            <div class="assets-title">AI GEO 数据资产</div>
+            <div style="text-align: center; font-size: 11px; color: rgba(255,255,255,0.45); margin-bottom: 12px;">已沉淀为标准化资产，可直接复用于欧美、北美等新市场</div>
+            <div class="terminal-grid">
+                <div class="asset-item">
+                    <div class="asset-value">200+</div>
+                    <div class="asset-label">三语关键词库</div>
+                </div>
+                <div class="asset-item">
+                    <div class="asset-value">200+</div>
+                    <div class="asset-label">AI Prompt库</div>
+                </div>
+                <div class="asset-item">
+                    <div class="asset-value">9类</div>
+                    <div class="asset-label">GEO分类体系</div>
+                </div>
+                <div class="asset-item">
+                    <div class="asset-value">12+</div>
+                    <div class="asset-label">GEO SOP流程</div>
+                </div>
+                <div class="asset-item">
+                    <div class="asset-value">15+</div>
+                    <div class="asset-label">GEO KPI指标</div>
+                </div>
+                <div class="asset-item">
+                    <div class="asset-value">10+</div>
+                    <div class="asset-label">竞品监测</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 效率对比 -->
+        <div class="efficiency-section">
+            <div class="efficiency-title">AI 工作流效率提升</div>
+            <div class="efficiency-row">
+                <div class="efficiency-top">
+                    <div class="efficiency-task">市场调研</div>
+                    <div class="efficiency-time">
+                        <span class="time-old">3-5d</span>
+                        <span class="arrow">→</span>
+                        <span class="time-new">4h</span>
+                    </div>
+                </div>
+                <div class="efficiency-bar-wrap"><div class="efficiency-bar" style="width: 85%;"></div></div>
+            </div>
+            <div class="efficiency-row">
+                <div class="efficiency-top">
+                    <div class="efficiency-task">关键词整理</div>
+                    <div class="efficiency-time">
+                        <span class="time-old">2-3d</span>
+                        <span class="arrow">→</span>
+                        <span class="time-new">3h</span>
+                    </div>
+                </div>
+                <div class="efficiency-bar-wrap"><div class="efficiency-bar" style="width: 80%;"></div></div>
+            </div>
+            <div class="efficiency-row">
+                <div class="efficiency-top">
+                    <div class="efficiency-task">合同审核</div>
+                    <div class="efficiency-time">
+                        <span class="time-old">1-2d</span>
+                        <span class="arrow">→</span>
+                        <span class="time-new">2h</span>
+                    </div>
+                </div>
+                <div class="efficiency-bar-wrap"><div class="efficiency-bar" style="width: 75%;"></div></div>
+            </div>
+            <div class="efficiency-row">
+                <div class="efficiency-top">
+                    <div class="efficiency-task">KPI设计</div>
+                    <div class="efficiency-time">
+                        <span class="time-old">3d</span>
+                        <span class="arrow">→</span>
+                        <span class="time-new">0.5d</span>
+                    </div>
+                </div>
+                <div class="efficiency-bar-wrap"><div class="efficiency-bar" style="width: 80%;"></div></div>
+            </div>
+        </div>
+
+        <!-- 团队亮点 -->
+        <div class="team-section">
+            <div class="team-title">组织升级的最佳证明</div>
+            <div class="team-desc" style="font-size: 13px; line-height: 1.8;"><span style="color: rgba(255,149,0,0.8);">传统模式：</span>需要10人团队、6个月搭建<br><span style="color: var(--accent);">AI模式：</span>2人团队、3个月落地</div>
+        </div>
+
+        <!-- 组织协同 -->
+        <div class="synergy-card">
+            <div class="synergy-label">
+                <svg class="icon-svg" viewBox="0 0 24 24" style="width:12px;height:12px;stroke:var(--purple);"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg>
+                AI能力下沉 · 组织协同
+            </div>
+            <div class="synergy-text">
+                本项目不仅是GEO项目，更是天娃<strong style="color: var(--purple);">AI协同工作模式</strong>的首次组织化实践
+            </div>
+        </div>
+
+        <!-- 战略价值 -->
+        <div class="value-section">
+            <div class="value-title">战略价值</div>
+            <div class="value-grid">
+                <div class="value-item">
+                    <div class="value-icon-wrap">
+                        <svg class="icon-svg" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></svg>
+                    </div>
+                    <span class="value-text">AI平台品牌曝光提升</span>
+                </div>
+                <div class="value-item">
+                    <div class="value-icon-wrap">
+                        <svg class="icon-svg" viewBox="0 0 24 24"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/></svg>
+                    </div>
+                    <span class="value-text">自然搜索可见度增长</span>
+                </div>
+                <div class="value-item">
+                    <div class="value-icon-wrap">
+                        <svg class="icon-svg" viewBox="0 0 24 24"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg>
+                    </div>
+                    <span class="value-text">印尼市场咨询提升</span>
+                </div>
+                <div class="value-item">
+                    <div class="value-icon-wrap">
+                        <svg class="icon-svg" viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+                    </div>
+                    <span class="value-text">AI搜索时代品牌占位</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- 拉票 -->
+        <div class="vote-section">
+            <div class="vote-title">需要您的支持！</div>
+            <div class="vote-desc">您的每一票都是对我们AI实践的认可</div>
+            <button onclick="openFullPlan()" class="vote-btn" title="探索完整参赛方案">
+                <svg class="fingerprint-icon" viewBox="0 0 24 24">
+                    <path class="fingerprint-path" d="M12 2a6 6 0 00-6 6v2a6 6 0 1012 0V8a6 6 0 00-6-6zm0 2a4 4 0 014 4v2a4 4 0 01-8 0V8a4 4 0 014-4z"/>
+                    <path class="fingerprint-path" d="M12 10a2 2 0 00-2 2v2a2 2 0 104 0v-2a2 2 0 00-2-2z" style="animation-delay: 0.3s"/>
+                    <path class="fingerprint-path" d="M12 14a2 2 0 00-2 2v2a2 2 0 104 0v-2a2 2 0 00-2-2z" style="animation-delay: 0.6s"/>
+                    <path class="fingerprint-path" d="M12 18a2 2 0 00-2 2v2a2 2 0 104 0v-2a2 2 0 00-2-2z" style="animation-delay: 0.9s"/>
+                </svg>
+                探索完整方案
+            </button>
+
+        </div>
+
+        <!-- 底部 -->
+        <div class="footer">
+            <div class="brand">天娃 AI 增长中心 × GEO</div>
+            <div class="track">赛道 02 · AI 效率优化</div>
+        </div>
+    </div>
+
+    <script>
+        // 神经网络拓扑背景
+        const canvas = document.getElementById('neural-canvas');
+        const ctx = canvas.getContext('2d');
+
+        function resize() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        }
+        resize();
+        window.addEventListener('resize', resize);
+
+        const nodes = [];
+        const nodeCount = 60;
+        const layerCount = 4;
+
+        class NeuralNode {
+            constructor() {
+                this.x = Math.random() * canvas.width;
+                this.y = Math.random() * canvas.height;
+                this.layer = Math.floor(Math.random() * layerCount);
+                this.size = Math.random() * 2 + 1;
+                this.speedX = (Math.random() - 0.5) * 0.2;
+                this.speedY = (Math.random() - 0.5) * 0.2;
+                this.opacity = Math.random() * 0.4 + 0.1;
+                this.pulsePhase = Math.random() * Math.PI * 2;
+            }
+            update() {
+                this.x += this.speedX;
+                this.y += this.speedY;
+                this.pulsePhase += 0.02;
+                if (this.x > canvas.width) this.x = 0;
+                if (this.x < 0) this.x = canvas.width;
+                if (this.y > canvas.height) this.y = 0;
+                if (this.y < 0) this.y = canvas.height;
+            }
+            draw() {
+                const pulse = Math.sin(this.pulsePhase) * 0.15 + 0.85;
+                const colors = ['rgba(10,132,255,', 'rgba(0,245,212,', 'rgba(168,85,247,', 'rgba(255,149,0,'];
+                const color = colors[this.layer % colors.length];
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, this.size * pulse, 0, Math.PI * 2);
+                ctx.fillStyle = color + (this.opacity * pulse) + ')';
+                ctx.fill();
+            }
+        }
+
+        for (let i = 0; i < nodeCount; i++) nodes.push(new NeuralNode());
+
+        function animate() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+            nodes.forEach(n => { n.update(); n.draw(); });
+
+            // 神经网络连线 - 不同层之间连接
+            for (let i = 0; i < nodes.length; i++) {
+                for (let j = i + 1; j < nodes.length; j++) {
+                    const dx = nodes[i].x - nodes[j].x;
+                    const dy = nodes[i].y - nodes[j].y;
+                    const dist = Math.sqrt(dx * dx + dy * dy);
+
+                    if (dist < 140) {
+                        const layerDiff = Math.abs(nodes[i].layer - nodes[j].layer);
+                        if (layerDiff <= 1) {
+                            const alpha = 0.08 * (1 - dist / 140);
+                            const isAccent = layerDiff === 1;
+                            ctx.beginPath();
+                            ctx.moveTo(nodes[i].x, nodes[i].y);
+                            ctx.lineTo(nodes[j].x, nodes[j].y);
+                            ctx.strokeStyle = isAccent
+                                ? `rgba(0, 245, 212, ${alpha * 1.5})`
+                                : `rgba(10, 132, 255, ${alpha})`;
+                            ctx.lineWidth = isAccent ? 0.8 : 0.4;
+                            ctx.stroke();
+                        }
+                    }
+                }
+            }
+
+            requestAnimationFrame(animate);
+        }
+        animate();
+
+        // 数字滚动
+        function animateCountUp() {
+            document.querySelectorAll('.stat-value[data-count]').forEach(counter => {
+                const target = parseInt(counter.getAttribute('data-count'));
+                const duration = 2000;
+                const startTime = performance.now();
+                function update(now) {
+                    const progress = Math.min((now - startTime) / duration, 1);
+                    const ease = 1 - Math.pow(1 - progress, 3);
+                    counter.textContent = Math.floor(target * ease) + '+';
+                    if (progress < 1) requestAnimationFrame(update);
+                }
+                requestAnimationFrame(update);
+            });
+        }
+        setTimeout(animateCountUp, 500);
+
+        // 全屏方案遮罩
+        function openFullPlan() {
+            window.open('https://oceanwang66888-star.github.io/ai-contest-proposal/', '_blank');
+            return;
+            /* 以下是旧的内嵌预览代码，已替换为线上跳转
+            const overlay = document.createElement('div');
+            overlay.id = 'full-plan-overlay';
+            overlay.style.cssText = `
+                position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
+                background: rgba(0,0,0,0.98); z-index: 9999; display: block;
+                overflow: hidden; animation: fadeIn 0.3s ease;
+            `;
+            const header = document.createElement('div');
+            header.style.cssText = `
+                position: fixed; top: 0; left: 0; right: 0; height: 60px;
+                background: rgba(10,14,23,0.95); backdrop-filter: blur(10px);
+                border-bottom: 1px solid rgba(0,245,212,0.3);
+                display: flex; justify-content: space-between; align-items: center;
+                padding: 0 24px; z-index: 10000;
+            `;
+            header.innerHTML = `
+                <div style="font-size: 20px; font-weight: 700; color: #00f5d4; text-shadow: 0 0 10px rgba(0,245,212,0.7);">
+                    完整参赛方案
+                </div>
+                <button onclick="closeFullPlan()" style="
+                    background: rgba(255,255,255,0.1); border: 1px solid rgba(0,245,212,0.4);
+                    color: #00f5d4; width: 40px; height: 40px; border-radius: 50%;
+                    display: flex; align-items: center; justify-content: center;
+                    cursor: pointer; font-size: 24px; font-weight: 300;
+                    transition: all 0.2s; line-height: 1;
+                " title="关闭 (Esc)">×</button>
+            `;
+            const iframe = document.createElement('iframe');
+            iframe.style.cssText = `
+                position: fixed; top: 60px; left: 0; width: 100vw; height: calc(100vh - 60px);
+                border: none; background: #fff; z-index: 9999;
+            `;
+            iframe.src = './AI驱动的海外GEO增长与组织升级体系-参赛方案.html';
+            
+            const loading = document.createElement('div');
+            loading.id = 'full-plan-loading';
+            loading.style.cssText = 'position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);color:#00f5d4;font-size:20px;z-index:10001;';
+            loading.textContent = '加载完整方案中...';
+            overlay.appendChild(loading);
+
+            iframe.onload = () => {
+                const l = document.getElementById('full-plan-loading');
+                if (l) l.remove();
+            };
+            iframe.onerror = () => {
+                const l = document.getElementById('full-plan-loading');
+                if (l) l.textContent = '加载失败，请确保方案文件与海报在同一目录下';
+            };
+            
+            overlay.appendChild(header);
+            overlay.appendChild(iframe);
+            document.body.appendChild(overlay);
+            
+            // ESC键关闭
+            document.addEventListener('keydown', function escHandler(e) {
+                if (e.key === 'Escape') {
+                    closeFullPlan();
+                    document.removeEventListener('keydown', escHandler);
+                }
+            });
+        }
+        function closeFullPlan() {
+            const overlay = document.getElementById('full-plan-overlay');
+            if (overlay) overlay.remove();
+        }
+    </script>
+</body>
+</html>
