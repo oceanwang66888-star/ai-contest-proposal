@@ -508,11 +508,36 @@
             flex: 1 !important;
         }
         
-        /* ── 金句区：横排网格 ── */
-        body.deck-mode .quotes-grid {
-            grid-template-columns: repeat(auto-fit, minmax(min(280px, 100%), 1fr)) !important;
-            gap: 16px !important;
+        /* ── 金句区：桌面横排网格（仅769px以上生效，不干扰手机） ── */
+        @media (min-width: 769px) {
+            body.deck-mode .quotes-grid {
+                grid-template-columns: repeat(auto-fit, minmax(min(280px, 100%), 1fr)) !important;
+                gap: 16px !important;
+            }
         }
+        /* 手机端（≤768px）：金句强制单列，绝对禁止竖排文字 */
+        @media (max-width: 768px) {
+            .quotes-grid,
+            body.deck-mode .quotes-grid {
+                display: flex !important;
+                flex-direction: column !important;
+                gap: 12px !important;
+            }
+            .quote-item,
+            body.deck-mode .quote-item {
+                width: 100% !important;
+                min-width: 0 !important;
+                max-width: 100% !important;
+                box-sizing: border-box !important;
+                word-break: break-word !important;
+                overflow-wrap: break-word !important;
+                white-space: normal !important;
+                font-size: 15px !important;
+                padding: 18px 18px 18px 22px !important;
+                line-height: 1.8 !important;
+            }
+        }
+
         
         /* ── 一页纸概览：所有card横排 ── */
         body.deck-mode #onepager .card {
@@ -1766,6 +1791,14 @@
             border-radius: 24px;
             padding: 60px;
             text-align: center;
+            box-sizing: border-box;
+        }
+
+        @media (max-width: 768px) {
+            .quotes-section {
+                padding: 20px 14px !important;
+                border-radius: 16px !important;
+            }
         }
 
         .quotes-section h3 {
@@ -1796,6 +1829,9 @@
             position: relative;
             transition: all 0.3s ease;
             border: 1px solid transparent;
+            word-break: break-word;
+            overflow-wrap: break-word;
+            white-space: normal;
         }
 
         .quote-item:hover {
@@ -1990,22 +2026,84 @@
 
         /* 效率对比行 — 手机端竖向卡片模式 */
 
+        /* ===== 手机端效率行：重新设计为清晰卡片 ===== */
         @media (max-width: 768px) {
             .side-nav { display: none; }
 
-            /* 效率行：改为竖向flex布局，手机端更可读 */
-            .efficiency-row {
-                display: flex;
-                flex-direction: column;
-                gap: 10px;
-                min-height: auto;
-                padding: 14px 16px;
-            }
-            .efficiency-task { font-size: 14px; font-weight: 700; }
-            .efficiency-time { text-align: left; font-size: 12px; }
-            .efficiency-boost { text-align: left; font-size: 14px; margin-top: 4px; }
-            .efficiency-bar { margin-top: 6px; }
+            .efficiency-chart { gap: 10px; }
 
+            .efficiency-row {
+                display: grid !important;
+                grid-template-columns: 1fr auto !important;
+                grid-template-rows: auto auto auto !important;
+                grid-template-areas:
+                    "task  boost"
+                    "bar1  bar1"
+                    "bar2  time" !important;
+                gap: 6px 10px !important;
+                padding: 14px 16px !important;
+                min-height: unset !important;
+                align-items: center !important;
+            }
+
+            .efficiency-task {
+                grid-area: task !important;
+                font-size: 14px !important;
+                font-weight: 700 !important;
+            }
+            .efficiency-boost {
+                grid-area: boost !important;
+                font-size: 15px !important;
+                text-align: right !important;
+                white-space: nowrap !important;
+            }
+            /* 第一个进度条（传统）占满一行 */
+            .efficiency-row .efficiency-bar:first-of-type {
+                grid-area: bar1 !important;
+                height: 10px !important;
+                margin: 0 !important;
+            }
+            /* 第二个进度条（AI）占左侧 */
+            .efficiency-row .efficiency-bar.ai {
+                grid-area: bar2 !important;
+                height: 10px !important;
+                margin: 0 !important;
+            }
+            .efficiency-time {
+                grid-area: time !important;
+                font-size: 11px !important;
+                text-align: right !important;
+                white-space: nowrap !important;
+                color: var(--accent) !important;
+            }
+
+            /* 进度条标签 — 用伪元素显示"传统/AI" */
+            .efficiency-row .efficiency-bar:first-of-type::before {
+                content: "传统";
+                position: absolute;
+                left: 6px; top: 50%;
+                transform: translateY(-50%);
+                font-size: 9px;
+                color: rgba(255,149,0,0.8);
+                font-weight: 600;
+                pointer-events: none;
+                z-index: 1;
+            }
+            .efficiency-row .efficiency-bar.ai::before {
+                content: "AI";
+                position: absolute;
+                left: 6px; top: 50%;
+                transform: translateY(-50%);
+                font-size: 9px;
+                color: var(--accent);
+                font-weight: 600;
+                pointer-events: none;
+                z-index: 1;
+            }
+            .efficiency-bar { position: relative; }
+
+            /* 其他模块手机端调整 */
+            .efficiency-boost { text-align: left; margin-top: 4px; }
             .flywheel { max-width: 300px; }
             .flywheel-node { width: 60px; height: 60px; font-size: 10px; }
             .flywheel-center { width: 80px; height: 80px; font-size: 11px; }
@@ -2013,8 +2111,8 @@
             .hero-stat { padding: 15px 20px; }
             .hero-stat-value { font-size: 28px; }
             .org-items.grid-4,
-            .value-grid.grid-3,
-            .quotes-grid { grid-template-columns: repeat(2, 1fr); }
+            .value-grid.grid-3 { grid-template-columns: repeat(2, 1fr); }
+            .quotes-grid { grid-template-columns: 1fr !important; }
             .conclusion-points { grid-template-columns: 1fr; }
             .modules-flow { grid-template-columns: 1fr !important; }
             .project-definition { padding: 30px 20px; }
@@ -2035,17 +2133,10 @@
             body.deck-mode section { padding: 30px 16px 60px !important; }
             .deck-bar { padding: 0 16px; height: 50px; }
             .deck-menu { right: 10px; width: 200px; }
-            /* deck-mode 小屏：表格容器降级 */
-            body.deck-mode .inline-proof {
-                font-size: 11px !important;
-            }
-            body.deck-mode .inline-proof table {
-                font-size: 11px !important;
-            }
+            body.deck-mode .inline-proof { font-size: 11px !important; }
+            body.deck-mode .inline-proof table { font-size: 11px !important; }
             body.deck-mode .inline-proof table th,
-            body.deck-mode .inline-proof table td {
-                padding: 6px 8px !important;
-            }
+            body.deck-mode .inline-proof table td { padding: 6px 8px !important; }
         }
 
         /* 超小屏手机 (≤480px) — 新增断点 */
@@ -2063,13 +2154,14 @@
             .conclusion { padding: 24px 14px; border-radius: 16px; }
             .conclusion-points { grid-template-columns: 1fr; gap: 10px; }
             .value-grid.grid-3,
-            .org-items.grid-4,
-            .quotes-grid { grid-template-columns: 1fr; }
+            .org-items.grid-4 { grid-template-columns: 1fr; }
+            .quotes-grid { grid-template-columns: 1fr !important; }
             .modules-flow { grid-template-columns: 1fr !important; }
-            .efficiency-row { padding: 12px; gap: 6px; }
-            .efficiency-task { font-size: 13px; }
-            .efficiency-time { font-size: 11px; }
-            .efficiency-boost { font-size: 13px; }
+            /* efficiency-row 延续 ≤768px 的 grid-areas 布局，仅调字号/间距 */
+            .efficiency-row { padding: 10px 12px !important; gap: 4px 8px !important; }
+            .efficiency-task { font-size: 13px !important; }
+            .efficiency-time { font-size: 10px !important; }
+            .efficiency-boost { font-size: 13px !important; }
             .flywheel-svg { max-width: 260px; }
             .flywheel-svg .node-text-main { font-size: 13px; }
             .flywheel-svg .node-text-sub { font-size: 10px; }
@@ -2086,7 +2178,7 @@
             .value-card p { font-size: 12px; }
             .quote-item { padding: 14px; font-size: 13px; }
             .quote-item::before { font-size: 32px; }
-            .efficiency-bar { height: 24px; }
+            .efficiency-bar { height: 14px !important; }
             .conclusion p.conclusion-highlight { font-size: 16px; }
             .conclusion p.conclusion-slogan { font-size: 18px; }
             body.deck-mode section { padding: 20px 12px 56px !important; }
@@ -2119,11 +2211,11 @@
             .conclusion-slogan { font-size: 15px; }
             .quote-item { padding: 10px; font-size: 12px; }
             .quote-item::before { font-size: 28px; }
-            .efficiency-row { padding: 10px; gap: 4px; }
-            .efficiency-task { font-size: 12px; }
-            .efficiency-time { font-size: 10px; }
-            .efficiency-boost { font-size: 12px; }
-            .efficiency-bar { height: 20px; }
+            .efficiency-row { padding: 8px 10px !important; gap: 3px 6px !important; }
+            .efficiency-task { font-size: 12px !important; }
+            .efficiency-time { font-size: 10px !important; }
+            .efficiency-boost { font-size: 12px !important; }
+            .efficiency-bar { height: 12px !important; }
             .section-title { font-size: clamp(20px, 5vw, 24px); }
             .asset-value { font-size: 28px; }
             .agent-table th, .agent-table td { padding: 6px 4px; font-size: 10px; }
@@ -2203,15 +2295,7 @@
         img, video, iframe, canvas { max-width: 100%; }
         html { overflow-x: hidden; }
 
-        /* efficiency-row: 481px-768px 也需要竖向布局 */
-        @media (max-width: 768px) and (min-width: 481px) {
-            .efficiency-row {
-                display: flex;
-                flex-direction: column;
-                gap: 8px;
-                min-height: auto;
-            }
-        }
+        /* efficiency-row: 手机端已在 ≤768px 断点内完整处理 */
 
         /* 平板小屏防溢出补丁 */
         @media (max-width: 600px) {
@@ -2278,19 +2362,19 @@
 
         <div class="hero-stats">
             <div class="hero-stat">
-                <div class="hero-stat-value" data-count="200" data-suffix="+">200</div>
+                <div class="hero-stat-value" data-count="200" data-suffix="+">0</div>
                 <div class="hero-stat-label">数据资产积累</div>
             </div>
             <div class="hero-stat">
-                <div class="hero-stat-value" data-count="80" data-suffix="+">80</div>
+                <div class="hero-stat-value" data-count="80" data-suffix="+">0</div>
                 <div class="hero-stat-label">平均效率提升</div>
             </div>
             <div class="hero-stat">
-                <div class="hero-stat-value" data-count="5">5</div>
+                <div class="hero-stat-value" data-count="5">0</div>
                 <div class="hero-stat-label">AI模块体系</div>
             </div>
             <div class="hero-stat">
-                <div class="hero-stat-value" data-count="2">2</div>
+                <div class="hero-stat-value" data-count="2">0</div>
                 <div class="hero-stat-label">2人团队</div>
             </div>
         </div>
@@ -3801,7 +3885,7 @@
                     }
                 }
             });
-        }, { threshold: 0.2 });
+        }, { threshold: 0.1, rootMargin: '0px 0px -20px 0px' });
 
         // 注册所有数字计数器
         document.querySelectorAll('.hero-stat-value[data-count], .asset-value[data-count]').forEach(el => {
@@ -3817,6 +3901,18 @@
                 });
             });
         });
+
+        // 页面加载后延迟100ms检查——手机上hero区已在视口内但observer可能错过
+        setTimeout(() => {
+            document.querySelectorAll('.hero-stat-value[data-count], .asset-value[data-count]').forEach(el => {
+                const rect = el.getBoundingClientRect();
+                const inView = rect.top < window.innerHeight && rect.bottom > 0;
+                if (inView && !el.classList.contains('counted')) {
+                    el.classList.add('counted');
+                    animateCounter(el);
+                }
+            });
+        }, 100);
 
         // 注册所有进度条行
         document.querySelectorAll('.efficiency-row[data-animate]').forEach(el => {

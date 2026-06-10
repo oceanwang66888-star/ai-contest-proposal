@@ -821,19 +821,19 @@
         <!-- 核心数据 -->
         <div class="core-stats">
             <div class="stat-box">
-                <div class="stat-value" data-count="200">0</div>
+                <div class="stat-value" data-count="200">0+</div>
                 <div class="stat-label">数据资产</div>
             </div>
             <div class="stat-box">
-                <div class="stat-value" data-count="80">0</div>
+                <div class="stat-value" data-count="80">0+</div>
                 <div class="stat-label">效率提升%</div>
             </div>
             <div class="stat-box">
-                <div class="stat-value">5</div>
+                <div class="stat-value" data-count="5" data-suffix="">0</div>
                 <div class="stat-label">AI模块</div>
             </div>
             <div class="stat-box">
-                <div class="stat-value">2</div>
+                <div class="stat-value" data-count="2" data-suffix="">0</div>
                 <div class="stat-label">人团队</div>
             </div>
         </div>
@@ -1021,7 +1021,7 @@
         <div class="vote-section">
             <div class="vote-title">需要您的支持！</div>
             <div class="vote-desc">您的每一票都是对我们AI实践的认可</div>
-            <a href="https://oceanwang66888-star.github.io/ai-contest-proposal/" target="_blank" class="vote-btn" title="探索完整参赛方案" style="display:inline-flex;align-items:center;justify-content:center;text-decoration:none;">
+            <button onclick="openFullPlan()" class="vote-btn" title="探索完整参赛方案">
                 <svg class="fingerprint-icon" viewBox="0 0 24 24">
                     <path class="fingerprint-path" d="M12 2a6 6 0 00-6 6v2a6 6 0 1012 0V8a6 6 0 00-6-6zm0 2a4 4 0 014 4v2a4 4 0 01-8 0V8a4 4 0 014-4z"/>
                     <path class="fingerprint-path" d="M12 10a2 2 0 00-2 2v2a2 2 0 104 0v-2a2 2 0 00-2-2z" style="animation-delay: 0.3s"/>
@@ -1029,7 +1029,7 @@
                     <path class="fingerprint-path" d="M12 18a2 2 0 00-2 2v2a2 2 0 104 0v-2a2 2 0 00-2-2z" style="animation-delay: 0.9s"/>
                 </svg>
                 探索完整方案
-            </a>
+            </button>
 
         </div>
 
@@ -1140,89 +1140,62 @@
             else { animate(); }
         });
 
-        // 数字滚动
-        function animateCountUp() {
-            document.querySelectorAll('.stat-value[data-count]').forEach(counter => {
-                const target = parseInt(counter.getAttribute('data-count'));
-                const duration = 2000;
-                const startTime = performance.now();
-                function update(now) {
-                    const progress = Math.min((now - startTime) / duration, 1);
-                    const ease = 1 - Math.pow(1 - progress, 3);
-                    counter.textContent = Math.floor(target * ease) + '+';
-                    if (progress < 1) requestAnimationFrame(update);
-                }
-                requestAnimationFrame(update);
-            });
+        // 数字滚动 — 步进法，不依赖 performance.now()，全平台兼容
+        function runCounter(counter) {
+            counter.dataset.animated = '1';
+            const target = parseInt(counter.getAttribute('data-count'));
+            const suffix = counter.getAttribute('data-suffix') != null
+                ? counter.getAttribute('data-suffix') : '+';
+            // 先重置为0，再滚动
+            counter.textContent = '0' + suffix;
+            const steps = 60;
+            let current = 0;
+            function tick() {
+                current++;
+                const ease = 1 - Math.pow(1 - current / steps, 3);
+                counter.textContent = Math.floor(target * ease) + suffix;
+                if (current < steps) requestAnimationFrame(tick);
+                else counter.textContent = target + suffix;
+            }
+            requestAnimationFrame(tick);
         }
-        setTimeout(animateCountUp, 500);
+
+        function initCounters() {
+            console.log('initCounters called');
+            const counters = document.querySelectorAll('.stat-value[data-count]');
+            console.log('found counters:', counters.length);
+            if (!counters.length) return;
+
+            if ('IntersectionObserver' in window) {
+                const obs = new IntersectionObserver((entries) => {
+                    entries.forEach(e => { if (e.isIntersecting) runCounter(e.target); });
+                }, { threshold: 0.1 });
+                counters.forEach(el => obs.observe(el));
+            }
+
+            // 100ms 兜底：首屏可见元素直接触发
+            setTimeout(() => {
+                counters.forEach(el => {
+                    const r = el.getBoundingClientRect();
+                    if (r.top < window.innerHeight && r.bottom > 0) runCounter(el);
+                });
+            }, 100);
+
+            // 800ms 终极兜底
+            setTimeout(() => { counters.forEach(el => runCounter(el)); }, 800);
+        }
+
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', initCounters);
+        } else {
+            initCounters();
+        }
 
         // 全屏方案遮罩
         function openFullPlan() {
             window.open('https://oceanwang66888-star.github.io/ai-contest-proposal/', '_blank');
-            return;
-            /* 以下是旧的内嵌预览代码，已替换为线上跳转
-            const overlay = document.createElement('div');
-            overlay.id = 'full-plan-overlay';
-            overlay.style.cssText = `
-                position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
-                background: rgba(0,0,0,0.98); z-index: 9999; display: block;
-                overflow: hidden; animation: fadeIn 0.3s ease;
-            `;
-            const header = document.createElement('div');
-            header.style.cssText = `
-                position: fixed; top: 0; left: 0; right: 0; height: 60px;
-                background: rgba(10,14,23,0.95); backdrop-filter: blur(10px);
-                border-bottom: 1px solid rgba(0,245,212,0.3);
-                display: flex; justify-content: space-between; align-items: center;
-                padding: 0 24px; z-index: 10000;
-            `;
-            header.innerHTML = `
-                <div style="font-size: 20px; font-weight: 700; color: #00f5d4; text-shadow: 0 0 10px rgba(0,245,212,0.7);">
-                    完整参赛方案
-                </div>
-                <button onclick="closeFullPlan()" style="
-                    background: rgba(255,255,255,0.1); border: 1px solid rgba(0,245,212,0.4);
-                    color: #00f5d4; width: 40px; height: 40px; border-radius: 50%;
-                    display: flex; align-items: center; justify-content: center;
-                    cursor: pointer; font-size: 24px; font-weight: 300;
-                    transition: all 0.2s; line-height: 1;
-                " title="关闭 (Esc)">×</button>
-            `;
-            const iframe = document.createElement('iframe');
-            iframe.style.cssText = `
-                position: fixed; top: 60px; left: 0; width: 100vw; height: calc(100vh - 60px);
-                border: none; background: #fff; z-index: 9999;
-            `;
-            iframe.src = './AI驱动的海外GEO增长与组织升级体系-参赛方案.html';
-            
-            const loading = document.createElement('div');
-            loading.id = 'full-plan-loading';
-            loading.style.cssText = 'position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);color:#00f5d4;font-size:20px;z-index:10001;';
-            loading.textContent = '加载完整方案中...';
-            overlay.appendChild(loading);
-
-            iframe.onload = () => {
-                const l = document.getElementById('full-plan-loading');
-                if (l) l.remove();
-            };
-            iframe.onerror = () => {
-                const l = document.getElementById('full-plan-loading');
-                if (l) l.textContent = '加载失败，请确保方案文件与海报在同一目录下';
-            };
-            
-            overlay.appendChild(header);
-            overlay.appendChild(iframe);
-            document.body.appendChild(overlay);
-            
-            // ESC键关闭
-            document.addEventListener('keydown', function escHandler(e) {
-                if (e.key === 'Escape') {
-                    closeFullPlan();
-                    document.removeEventListener('keydown', escHandler);
-                }
-            });
         }
+
         function closeFullPlan() {
             const overlay = document.getElementById('full-plan-overlay');
             if (overlay) overlay.remove();
