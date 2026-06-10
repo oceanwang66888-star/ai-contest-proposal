@@ -2,7 +2,7 @@
 <html lang="zh-CN">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>AI驱动的海外GEO增长 - 拉票海报 v2</title>
     <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Noto+Sans+SC:wght@300;400;500;600;700;900&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
     <style>
@@ -351,6 +351,13 @@
             margin-bottom: 12px;
         }
 
+        .assets-subtitle {
+            text-align: center;
+            font-size: 11px;
+            color: rgba(255, 255, 255, 0.45);
+            margin-bottom: 12px;
+        }
+
         .terminal-grid {
             display: grid;
             grid-template-columns: repeat(3, 1fr);
@@ -503,8 +510,9 @@
         }
 
         .team-desc {
-            font-size: 12px;
+            font-size: 13px;
             color: rgba(255, 255, 255, 0.7);
+            line-height: 1.8;
         }
 
         /* 组织协同卡片 */
@@ -700,14 +708,95 @@
             color: rgba(255, 255, 255, 0.35);
         }
 
-        /* 响应式 */
+        /* 响应式 — 三端完整适配 */
+
+        /* 超小屏手机 (≤380px) */
+        @media (max-width: 380px) {
+            .header { padding: 28px 18px 22px; }
+            .title { font-size: 22px; }
+            .core-stats { grid-template-columns: repeat(2, 1fr); gap: 8px; padding: 0 16px; }
+            /* 超小屏: 5模块保持一行，极简显示 */
+            .modules-grid { grid-template-columns: repeat(5, 1fr); gap: 4px; justify-items: center; }
+            .module-item { padding: 8px 2px; border-radius: 8px; }
+            .module-icon-wrap { width: 24px; height: 24px; border-radius: 6px; }
+            .terminal-grid { grid-template-columns: repeat(2, 1fr); gap: 8px; }
+            .stat-value { font-size: 20px; }
+            .stat-label { font-size: 9px; }
+            .asset-value { font-size: 18px; }
+            .asset-label { font-size: 9px; }
+            .module-name { font-size: 9px; }
+            .ai-bubble { padding: 14px; }
+            .ai-bubble-text { font-size: 13px; }
+            .vote-btn { padding: 14px 32px; font-size: 15px; }
+            .team-title { font-size: 20px; }
+            .vote-title { font-size: 18px; }
+            .value-grid { gap: 8px; }
+            .value-text { font-size: 10px; }
+            .value-icon-wrap { width: 28px; height: 28px; border-radius: 6px; }
+            .value-item { padding: 10px; gap: 8px; }
+            .poster { border-radius: 18px; }
+            .efficiency-section, .modules-section, .assets-section,
+            .ai-chat, .team-section, .synergy-card, .value-section,
+            .vote-section, .footer { margin-left: 16px; margin-right: 16px; }
+            .modules-section, .assets-section, .efficiency-section, .value-section { padding: 0 16px; }
+        }
+
+        /* 常规手机 (≤420px) */
         @media (max-width: 420px) {
             .title { font-size: 24px; }
             .core-stats { grid-template-columns: repeat(2, 1fr); }
-            .modules-grid { grid-template-columns: repeat(3, 1fr); }
+            /* 5个模块保持5列，字号缩小适配 */
+            .modules-grid { grid-template-columns: repeat(5, 1fr); gap: 5px; }
+            .module-item { padding: 10px 4px; }
+            .module-icon-wrap { width: 28px; height: 28px; border-radius: 8px; }
+            .module-name { font-size: 9px; }
             .terminal-grid { grid-template-columns: repeat(2, 1fr); }
             .stat-value { font-size: 22px; }
+            .asset-value { font-size: 20px; }
+            .team-desc { font-size: 12px; }
+            .synergy-text { font-size: 12px; }
         }
+
+        /* 大屏手机 / 小平板 (421px–768px) */
+        @media (min-width: 421px) and (max-width: 768px) {
+            .poster { max-width: 600px; }
+            .title { font-size: 30px; }
+            .stat-value { font-size: 28px; }
+            .asset-value { font-size: 24px; }
+            .modules-grid { gap: 10px; }
+            .terminal-grid { gap: 12px; }
+        }
+
+        /* 平板竖屏 (769px–1024px) */
+        @media (min-width: 769px) and (max-width: 1024px) {
+            .poster { max-width: 640px; }
+            .title { font-size: 32px; }
+            .stat-value { font-size: 30px; }
+            .asset-value { font-size: 26px; }
+            .badge { font-size: 13px; padding: 10px 22px; }
+            .ai-bubble-text { font-size: 16px; }
+            .vote-btn { padding: 18px 56px; font-size: 18px; }
+        }
+
+        /* 桌面端 (1025px+) — 保持原样540px居中卡片 */
+        @media (min-width: 1025px) {
+            .poster { max-width: 540px; }
+        }
+
+        /* 无障碍：减少动画 */
+        @media (prefers-reduced-motion: reduce) {
+            .badge { animation: none; }
+            .data-stream { animation: none; opacity: 0; }
+            .vote-btn { animation: none; }
+            .fingerprint-path { animation: none; stroke-dashoffset: 0; opacity: 1; }
+            .poster::before { animation: none; }
+            .synergy-card::before { animation: none; }
+        }
+
+        /* === 全局溢出安全网 === */
+        img, video, iframe { max-width: 100%; }
+        body { overflow-x: hidden; }
+        .poster * { max-width: 100%; }
     </style>
 </head>
 <body>
@@ -802,7 +891,7 @@
         <!-- 数据资产 -->
         <div class="assets-section">
             <div class="assets-title">AI GEO 数据资产</div>
-            <div style="text-align: center; font-size: 11px; color: rgba(255,255,255,0.45); margin-bottom: 12px;">已沉淀为标准化资产，可直接复用于欧美、北美等新市场</div>
+            <div class="assets-subtitle">已沉淀为标准化资产，可直接复用于欧美、北美等新市场</div>
             <div class="terminal-grid">
                 <div class="asset-item">
                     <div class="asset-value">200+</div>
@@ -883,7 +972,7 @@
         <!-- 团队亮点 -->
         <div class="team-section">
             <div class="team-title">组织升级的最佳证明</div>
-            <div class="team-desc" style="font-size: 13px; line-height: 1.8;"><span style="color: rgba(255,149,0,0.8);">传统模式：</span>需要10人团队、6个月搭建<br><span style="color: var(--accent);">AI模式：</span>2人团队、3个月落地</div>
+            <div class="team-desc"><span style="color: rgba(255,149,0,0.8);">传统模式：</span>需要10人团队、6个月搭建<br><span style="color: var(--accent);">AI模式：</span>2人团队、3个月落地</div>
         </div>
 
         <!-- 组织协同 -->
@@ -932,7 +1021,7 @@
         <div class="vote-section">
             <div class="vote-title">需要您的支持！</div>
             <div class="vote-desc">您的每一票都是对我们AI实践的认可</div>
-            <div onclick="window.location.href='https://oceanwang66888-star.github.io/ai-contest-proposal/'" class="vote-btn" title="探索完整参赛方案" style="cursor:pointer;display:inline-flex;align-items:center;justify-content:center;">
+            <div onclick="openFullPlan()" class="vote-btn" title="探索完整参赛方案" style="cursor:pointer">
                 <svg class="fingerprint-icon" viewBox="0 0 24 24">
                     <path class="fingerprint-path" d="M12 2a6 6 0 00-6 6v2a6 6 0 1012 0V8a6 6 0 00-6-6zm0 2a4 4 0 014 4v2a4 4 0 01-8 0V8a4 4 0 014-4z"/>
                     <path class="fingerprint-path" d="M12 10a2 2 0 00-2 2v2a2 2 0 104 0v-2a2 2 0 00-2-2z" style="animation-delay: 0.3s"/>
@@ -956,21 +1045,31 @@
         const canvas = document.getElementById('neural-canvas');
         const ctx = canvas.getContext('2d');
 
+        // 移动端降低粒子数量，节省性能
+        const isMobile = window.innerWidth <= 480;
+        const isTablet = window.innerWidth <= 768;
+        const activeNodeCount = isMobile ? 25 : isTablet ? 40 : 60;
+
         function resize() {
-            canvas.width = window.innerWidth;
-            canvas.height = window.innerHeight;
+            // 限制 DPR 最高 2，避免高分辨率手机过度渲染
+            const dpr = Math.min(window.devicePixelRatio || 1, 2);
+            canvas.width = window.innerWidth * dpr;
+            canvas.height = window.innerHeight * dpr;
+            canvas.style.width = window.innerWidth + 'px';
+            canvas.style.height = window.innerHeight + 'px';
+            ctx.scale(dpr, dpr);
         }
         resize();
-        window.addEventListener('resize', resize);
+        window.addEventListener('resize', () => { resize(); });
 
         const nodes = [];
-        const nodeCount = 60;
+        const nodeCount = activeNodeCount;
         const layerCount = 4;
 
         class NeuralNode {
             constructor() {
-                this.x = Math.random() * canvas.width;
-                this.y = Math.random() * canvas.height;
+                this.x = Math.random() * window.innerWidth;
+                this.y = Math.random() * window.innerHeight;
                 this.layer = Math.floor(Math.random() * layerCount);
                 this.size = Math.random() * 2 + 1;
                 this.speedX = (Math.random() - 0.5) * 0.2;
@@ -982,10 +1081,10 @@
                 this.x += this.speedX;
                 this.y += this.speedY;
                 this.pulsePhase += 0.02;
-                if (this.x > canvas.width) this.x = 0;
-                if (this.x < 0) this.x = canvas.width;
-                if (this.y > canvas.height) this.y = 0;
-                if (this.y < 0) this.y = canvas.height;
+                if (this.x > window.innerWidth) this.x = 0;
+                if (this.x < 0) this.x = window.innerWidth;
+                if (this.y > window.innerHeight) this.y = 0;
+                if (this.y < 0) this.y = window.innerHeight;
             }
             draw() {
                 const pulse = Math.sin(this.pulsePhase) * 0.15 + 0.85;
@@ -1000,8 +1099,10 @@
 
         for (let i = 0; i < nodeCount; i++) nodes.push(new NeuralNode());
 
+        // 页面不可见时暂停动画，节省电量
+        let animId;
         function animate() {
-            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            ctx.clearRect(0, 0, window.innerWidth, window.innerHeight);
 
             nodes.forEach(n => { n.update(); n.draw(); });
 
@@ -1030,9 +1131,14 @@
                 }
             }
 
-            requestAnimationFrame(animate);
+            animId = requestAnimationFrame(animate);
         }
         animate();
+
+        document.addEventListener('visibilitychange', () => {
+            if (document.hidden) { cancelAnimationFrame(animId); }
+            else { animate(); }
+        });
 
         // 数字滚动
         function animateCountUp() {
@@ -1053,7 +1159,7 @@
 
         // 全屏方案遮罩
         function openFullPlan() {
-            window.open('https://oceanwang66888-star.github.io/ai-contest-proposal/', '_blank');
+            window.location.href='https://oceanwang66888-star.github.io/ai-contest-proposal/';
             return;
             /* 以下是旧的内嵌预览代码，已替换为线上跳转
             const overlay = document.createElement('div');
